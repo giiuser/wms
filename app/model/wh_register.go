@@ -15,32 +15,33 @@ type WhRegister struct {
 }
 
 type product struct {
-	productId int `json:"product_id"`
-	qty       int `json:"qty"`
+	productId int
+	qty       int
 }
 
-func MakePosting(documentId int, documentType string) ([]product, error) {
+func MakePosting(documentId int, documentType string, direction bool) error {
 	query := fmt.Sprintf("SELECT product_id, qty FROM %s_table WHERE id=%d", documentType, documentId)
 	rows, err := DB.Query(query)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer rows.Close()
 
-	products := []product{}
-
 	for rows.Next() {
 		var p product
 		if err := rows.Scan(&p.productId, &p.qty); err != nil {
-			return nil, err
+			return err
 		}
-		createRow(p.productId, p.qty, documentId, documentType)
-		products = append(products, p)
+		qty := p.qty
+		if !direction {
+			qty *= -1
+		}
+		createRow(p.productId, qty, documentId, documentType)
 	}
 
-	return products, nil
+	return nil
 }
 
 func createRow(productId int, qty int, documentId int, documentType string) error {

@@ -93,7 +93,9 @@ func ChangeStatusReceipt(id int, status int) error {
 		status, id)
 
 	if status == 2 {
-		MakePosting(id, "receipt")
+		MakePosting(id, "receipt", true)
+	} else if status == 1 {
+		MakePosting(id, "receipt", false)
 	}
 
 	return err
