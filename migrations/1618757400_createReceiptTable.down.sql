@@ -1,0 +1,3 @@
+ALTER TABLE receipt_table DROP CONSTRAINT IF EXISTS fk_receipt;
+DROP TABLE IF EXISTS receipt_table;
+DROP TABLE IF EXISTS receipt;
