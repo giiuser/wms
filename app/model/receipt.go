@@ -2,8 +2,6 @@
 
 package model
 
-// var DB *sql.DB
-
 type Receipt struct {
 	ID     int `json:"id"`
 	Status int `json:"status"`
@@ -93,6 +91,10 @@ func GetReceipts(start, count int) ([]Receipt, error) {
 func ChangeStatusReceipt(id int, status int) error {
 	_, err := DB.Exec("UPDATE receipt SET status=$1 WHERE id=$2",
 		status, id)
+
+	if status == 2 {
+		MakePosting(id, "receipt")
+	}
 
 	return err
 }
