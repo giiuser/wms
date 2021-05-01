@@ -1,0 +1,3 @@
+ALTER TABLE collect_table DROP CONSTRAINT IF EXISTS fk_collect;
+DROP TABLE IF EXISTS collect_table;
+DROP TABLE IF EXISTS collect;

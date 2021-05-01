@@ -20,18 +20,18 @@ type product struct {
 }
 
 func MakePosting(documentId int, documentType string, direction bool) error {
-	query := fmt.Sprintf("SELECT product_id, qty FROM %s_table WHERE id=%d", documentType, documentId)
+	query := fmt.Sprintf("SELECT product_id, qty FROM %s_table WHERE %s_id=%d", documentType, documentType, documentId)
 	rows, err := DB.Query(query)
 
 	if err != nil {
 		return err
 	}
-
 	defer rows.Close()
 
 	for rows.Next() {
 		var p product
 		if err := rows.Scan(&p.productId, &p.qty); err != nil {
+			fmt.Println(err)
 			return err
 		}
 		qty := p.qty

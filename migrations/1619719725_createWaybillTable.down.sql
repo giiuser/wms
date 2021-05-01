@@ -1,0 +1,3 @@
+ALTER TABLE waybill_table DROP CONSTRAINT IF EXISTS fk_waybill;
+DROP TABLE IF EXISTS waybill_table;
+DROP TABLE IF EXISTS waybill;
