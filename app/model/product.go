@@ -4,30 +4,30 @@ package model
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 var DB *sql.DB
 
 type Product struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Brand string `json:"brand"`
 }
 
 func GetProduct(id int) (Product, error) {
 	var p Product
-	row := DB.QueryRow("SELECT id, name FROM product WHERE id=$1", id)
+	row := DB.QueryRow("SELECT id, name, brand FROM product WHERE id=$1", id)
 
-	if err := row.Scan(&p.ID, &p.Name); err != nil {
+	if err := row.Scan(&p.ID, &p.Name, &p.Brand); err != nil {
 		return p, err
 	}
 
 	return p, nil
 }
 
-func UpdateProduct(id int, name string) error {
-	_, err := DB.Exec("UPDATE product SET name=$1 WHERE id=$2",
-		name, id)
+func UpdateProduct(id int, name string, brand string) error {
+	_, err := DB.Exec("UPDATE product SET name=$1, brand=$2 WHERE id=$3",
+		name, brand, id)
 
 	return err
 }
@@ -38,12 +38,11 @@ func DeleteProduct(id int) error {
 	return err
 }
 
-func CreateProduct(name string) (Product, error) {
+func CreateProduct(name string, brand string) (Product, error) {
 	var p Product
-	fmt.Println(name)
 	err := DB.QueryRow(
-		"INSERT INTO product(name) VALUES($1) RETURNING id, name",
-		name).Scan(&p.ID, &p.Name)
+		"INSERT INTO product(name, brand) VALUES($1, $2) RETURNING id, name, brand",
+		name, brand).Scan(&p.ID, &p.Name, &p.Brand)
 
 	if err != nil {
 		return p, err
@@ -54,7 +53,7 @@ func CreateProduct(name string) (Product, error) {
 
 func GetProducts(start, count int) ([]Product, error) {
 	rows, err := DB.Query(
-		"SELECT id, name FROM product LIMIT $1 OFFSET $2",
+		"SELECT id, name, brand FROM product LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -67,7 +66,7 @@ func GetProducts(start, count int) ([]Product, error) {
 
 	for rows.Next() {
 		var p Product
-		if err := rows.Scan(&p.ID, &p.Name); err != nil {
+		if err := rows.Scan(&p.ID, &p.Name, &p.Brand); err != nil {
 			return nil, err
 		}
 		products = append(products, p)

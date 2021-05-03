@@ -7,6 +7,7 @@ import ProductCreate from './components/product/Create';
 import ProductEdit from './components/product/Edit';
 import ReceiptIndex from './components/receipt/Index';
 import ReceiptEdit from './components/receipt/Edit';
+import AllocationEdit from './components/allocation/Edit';
 
 import Axios from "axios";
 
@@ -65,24 +66,47 @@ export default new VueRouter({
         path: "/receipt/new",
         name: "createreceipt",
         component: ReceiptEdit,
-        // async beforeEnter(routeTo, routeFrom, next) {
-        //     try {
-        //         const response = await Axios.post("/receipt");
+        async beforeEnter(routeTo, routeFrom, next) {
+            try {
+                const response = await Axios.post("/receipt", {});
 
-        //         if (response.status !== 200) {
-        //             throw "posting error";
-        //         }
+                if (response.status !== 201) {
+                    throw "posting error";
+                }
 
-        //         next("/receipt/" + response.data);
-        //     } catch (error) {
-        //         alert(error);
-        //     }
-        // }
+                next("/receipt/" + response.data.id);
+            } catch (error) {
+                alert(error);
+            }
+        }
     },
-    // {
-    //     path: "/receipt/:receiptId",
-    //     name: "editreceipt",
-    //     component: ReceiptEdit
-    // },
+    {
+        path: "/receipt/:receiptId",
+        name: "editreceipt",
+        component: ReceiptEdit
+    },
+    {
+        path: "/allocation/new",
+        name: "createallocation",
+        component: AllocationEdit,
+        async beforeEnter(routeTo, routeFrom, next) {
+            try {
+                const response = await Axios.post("/allocation", {});
+
+                if (response.status !== 201) {
+                    throw "posting error";
+                }
+
+                next("/allocation/" + response.data.id);
+            } catch (error) {
+                alert(error);
+            }
+        }
+    },
+    {
+        path: "/allocation/:allocationId",
+        name: "editallocation",
+        component: AllocationEdit
+    },
  ]
 });

@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS "allocation_table" (
   "id" bigserial PRIMARY KEY,
   "allocation_id" bigint NOT NULL,
   "product_id" bigint NOT NULL,
-  "qty" integer NOT NULL
+  "qty" integer NOT NULL,
+  "cell_id" integer NOT NULL
 );
 
 ALTER TABLE allocation_table

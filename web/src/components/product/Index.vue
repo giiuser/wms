@@ -14,6 +14,7 @@
             >
                     <b-table-column field="id" label="ID" v-slot="props">{{props.row.id}}</b-table-column>
                     <b-table-column field="name" label="Наименование" v-slot="props">{{props.row.name}}</b-table-column>
+                    <b-table-column field="brand" label="Производитель" v-slot="props">{{props.row.brand}}</b-table-column>
                     <b-table-column field="actions" label="Действия" v-slot="props">
                         <router-link :to="'/products/' + props.row.id" class="button is-info is-small">Просмотр</router-link>
                     </b-table-column>

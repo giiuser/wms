@@ -78,7 +78,7 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	p, err := model.CreateProduct(p.Name)
+	p, err := model.CreateProduct(p.Name, p.Brand)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -105,7 +105,7 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	p.ID = id
 
-	if err := model.UpdateProduct(p.ID, p.Name); err != nil {
+	if err := model.UpdateProduct(p.ID, p.Name, p.Brand); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

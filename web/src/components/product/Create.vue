@@ -5,6 +5,10 @@
                 <b-input v-model="name"></b-input>
             </b-field>
 
+            <b-field label="Введите производителя">
+                <b-input v-model="brand"></b-input>
+            </b-field>
+
             <b-field v-if="errors.length">
                 <ul>
                     <li v-for="(error, key) in errors" :key="key">{{ error }}</li>
@@ -27,6 +31,7 @@ export default {
     name: "ProductCreate",
     data: () => ({
         name: "",
+        brand: "",
         errors: []
     }),
     methods: {
@@ -36,7 +41,8 @@ export default {
         create: function() {
             if (this.checkForm() === true) {
                 Axios.post("/product", {
-                    name: this.name
+                    name: this.name,
+                    brand: this.brand
                 })
                     .then(response => {
                         console.log(response)

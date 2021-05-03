@@ -56,23 +56,25 @@
                             <td>{{ item.name }}</td>
                             <td>
                                 <div class="quantity-toggle">
-                                    <button @click="decrement(key)">&mdash;</button>
+                                    <!-- <button @click="decrement(key)">&mdash;</button> -->
                                         <input type="text" :value="item.qty" readonly style="width:50px">
-                                    <button @click="increment(key)">&#xff0b;</button>
+                                    <!-- <button @click="increment(key)">&#xff0b;</button> -->
                                 </div>
                             </td>
-                            <td><font-awesome-icon @click="deleteItem(key)" class="has-text-danger" icon="trash" /></td>
+                            <td><font-awesome-icon @click="deleteRow(item.id, key)" class="has-text-danger" icon="trash" /></td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="card" v-if="!this.status">
+        <div class="card">
             <div class="card-content">
-                <p><a class="button is-primary is-rounded" @click="savePosting(false)">Сохранить</a>
+                <p>
+                    <a class="button is-success is-rounded" @click="posting()">{{ this.status == 2 ? 'Распровести' : 'Провести' }}</a>
                     &nbsp;&nbsp;&nbsp;
-                    <a class="button is-success is-rounded" @click="savePosting(true)">Сохранить и провести</a></p>
+                    <a class="button is-primary is-rounded" @click="createAllocation()">Создать размещение</a>
+                </p>
             </div>
         </div>
     </div>
@@ -88,20 +90,20 @@
     export default {
         name: "ReceiptEdit",
         async created() {
-            if (this.$route.params.postingId !== 'new' && this.$route.params.postingId !== undefined) {
+            if (this.$route.params.receiptId !== 'new' && this.$route.params.receiptId !== undefined) {
 
                 try {
-                    const response = await Axios.get('/api/postings/' + this.$route.params.postingId)
+                    const response = await Axios.get('/receipt/' + this.$route.params.receiptId)
 
                     if (response.status !== 200) {
-                        throw 'posting not available'
+                        throw 'receipt not available'
                     }
 
                     this.status = response.data.status
                     this.rowData = response.data.products
-                    this.document_id = response.data.id
+                    this.documentId = response.data.id
                 } catch (error) {
-                    alert(error)
+                    console.log(error)
                 }
 
             }
@@ -116,7 +118,7 @@
             suggestions: {},
             isLoading: false,
             fullPage: true,
-            document_id: null,
+            documentId: null,
             status: false
         }),
         methods: {
@@ -125,25 +127,27 @@
                     try {
                         console.log(this.barcode);
                         const response = await Axios.get('/product/' + this.barcode);
-                        response.data.qty = 1;
+                        response.data.qty = 1; 
+                        this.barcode = '';
+                        this.$refs.barcode.focus();
+                        const responseRow = await Axios.post('/receiptrow', {
+                            receipt_id: this.documentId,
+                            product_id: response.data.id,
+                            qty: response.data.qty
+                        });
+                        response.data.id = responseRow.data.id;
                         this.rowData.push(response.data);
                         console.log(this.rowData);
-                        this.barcode = ''
-                        this.$refs.barcode.focus()
                     } catch (error) {
-                        if (error.response.data.error === 'wrong_ware') {
-                            this.noWare = true
-                        }
-                        if (error.response.data.error === 'no_item_on_cell') {
-                            this.noItemOnCell = true
-                        }
+                        console.log(error);
                     }
                 } else {
                     console.log('error')
                 }
             },
-            deleteItem: async function (key) {
-                this.rowData.splice(key, 1)
+            deleteRow: async function (id, key) {
+                await Axios.delete('/receiptrow/' + id);
+                this.rowData.splice(key, 1);
             },
             increment (key) {
                 this.rowData[key].qty++
@@ -155,22 +159,17 @@
                     this.rowData[key].qty--
                 }
             },
-            savePosting: async function (status) {
-                this.isLoading = true
-                const {response} = await Axios.post(
-                    '/api/postings',
+            posting: async function () {
+                await Axios.patch('/receipt/' + this.$route.params.receiptId,
                     {
-                        products: this.rowData,
-                        stock_id: this.stockId,
-                        id: this.document_id,
-                        status
+                        status: this.status == 2 ? 1 : 2
                     }
                 )
-                this.isLoading = false
-                console.log(response);
+                this.status = this.status == 2 ? 1 : 2
             },
-            changePrice(key, event) {
-                this.rowData[key].price = event.target.value
+            createAllocation() {
+                this.$store.dispatch('allocation/setDocumentId', this.documentId);
+                this.$router.push('/allocation/new').catch(() => {});
             }
         },
         components: {

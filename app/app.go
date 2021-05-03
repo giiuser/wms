@@ -10,8 +10,8 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 
-	"wms/app/controller"
 	"fmt"
+	"wms/app/controller"
 )
 
 type App struct {
@@ -27,7 +27,7 @@ func CORS(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-    	w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
@@ -63,6 +63,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/receipt", controller.CreateReceipt).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/receipt/{id:[0-9]+}", controller.GetReceipt).Methods("GET")
 	a.Router.HandleFunc("/receiptrow", controller.CreateReceiptRow).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/receiptrow/{id:[0-9]+}", controller.DeleteReceiptRow).Methods("DELETE", "OPTIONS")
 	a.Router.HandleFunc("/receipt/{id:[0-9]+}", controller.ChangeStatusReceipt).Methods("PATCH", "OPTIONS")
 
 	a.Router.HandleFunc("/waybill", controller.CreateWaybill).Methods("POST", "OPTIONS")
@@ -70,7 +71,10 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/waybill/{id:[0-9]+}", controller.ChangeStatusWaybill).Methods("PATCH", "OPTIONS")
 
 	a.Router.HandleFunc("/allocation", controller.CreateAllocation).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/allocation/{id:[0-9]+}", controller.GetAllocation).Methods("GET")
+	a.Router.HandleFunc("/allocation/{id:[0-9]+}", controller.UpdateAllocation).Methods("PUT", "OPTIONS")
 	a.Router.HandleFunc("/allocationrow", controller.CreateAllocationRow).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/allocationrow/{id:[0-9]+}", controller.UpdateAllocationRow).Methods("PUT", "OPTIONS")
 	a.Router.HandleFunc("/allocation/{id:[0-9]+}", controller.ChangeStatusAllocation).Methods("PATCH", "OPTIONS")
 
 	a.Router.HandleFunc("/collect", controller.CreateCollect).Methods("POST", "OPTIONS")

@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS "collect_table" (
   "id" bigserial PRIMARY KEY,
   "collect_id" bigint NOT NULL,
   "product_id" bigint NOT NULL,
-  "qty" integer NOT NULL
+  "qty" integer NOT NULL,
+  "cell_id" integer NOT NULL
 );
 
 ALTER TABLE collect_table

@@ -2,8 +2,8 @@ package controller
 
 import (
 	"database/sql"
-	"strconv"
 	"fmt"
+	"strconv"
 	"wms/app/model"
 
 	"encoding/json"
@@ -61,6 +61,7 @@ func CreateReceipt(w http.ResponseWriter, r *http.Request) {
 	var rec model.Receipt
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&rec); err != nil {
+		fmt.Println(err)
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
@@ -93,6 +94,22 @@ func CreateReceiptRow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusCreated, p)
+}
+
+func DeleteReceiptRow(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Product ID")
+		return
+	}
+
+	if err := model.DeleteReceiptRow(id); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
 func ChangeStatusReceipt(w http.ResponseWriter, r *http.Request) {

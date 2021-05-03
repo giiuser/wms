@@ -5,6 +5,10 @@
                 <b-input v-model="name"></b-input>
             </b-field>
 
+            <b-field label="Введите производителя">
+                <b-input v-model="brand"></b-input>
+            </b-field>
+
             <b-field v-if="errors.length">
                 <ul>
                     <li v-for="(error, key) in errors" :key="key">{{ error }}</li>
@@ -27,6 +31,7 @@ export default {
     name: "ProductEdit",
     data: () => ({
         name: "",
+        brand: "",
         errors: []
     }),
     async created() {
@@ -39,7 +44,8 @@ export default {
                     throw 'product not available'
                 }
 
-                this.name = response.data.name
+                this.name = response.data.name;
+                this.brand = response.data.brand;
             } catch (error) {
                 alert(error)
             }

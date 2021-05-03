@@ -3,14 +3,17 @@
 package model
 
 type Receipt struct {
-	ID     int `json:"id"`
-	Status int `json:"status"`
+	ID       int          `json:"id"`
+	Status   int          `json:"status"`
+	Products []ReceiptRow `json:"products"`
 }
 
 type ReceiptRow struct {
-	ReceiptId int `json:"receipt_id"`
-	ProductId int `json:"product_id"`
-	Qty       int `json:"qty"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	ReceiptId int    `json:"receipt_id"`
+	ProductId int    `json:"product_id"`
+	Qty       int    `json:"qty"`
 }
 
 func GetReceipt(id int) (Receipt, error) {
@@ -20,6 +23,27 @@ func GetReceipt(id int) (Receipt, error) {
 	if err := row.Scan(&r.ID, &r.Status); err != nil {
 		return r, err
 	}
+
+	rows, err := DB.Query(
+		"SELECT rt.id, p.name, rt.receipt_id, rt.product_id, rt.qty FROM receipt_table rt JOIN product p ON p.id = rt.product_id WHERE receipt_id=$1",
+		id)
+
+	if err != nil {
+		return r, err
+	}
+
+	defer rows.Close()
+
+	products := []ReceiptRow{}
+
+	for rows.Next() {
+		var rr ReceiptRow
+		if err := rows.Scan(&rr.ID, &rr.Name, &rr.ReceiptId, &rr.ProductId, &rr.Qty); err != nil {
+			return r, err
+		}
+		products = append(products, rr)
+	}
+	r.Products = products
 
 	return r, nil
 }
@@ -54,8 +78,8 @@ func CreateReceiptRow(receiptId int, productId int, qty int) (ReceiptRow, error)
 	var rr ReceiptRow
 
 	err := DB.QueryRow(
-		"INSERT INTO receipt_table(receipt_id, product_id, qty) VALUES($1, $2, $3) RETURNING receipt_id, product_id, qty",
-		receiptId, productId, qty).Scan(&rr.ReceiptId, &rr.ProductId, &rr.Qty)
+		"INSERT INTO receipt_table(receipt_id, product_id, qty) VALUES($1, $2, $3) RETURNING id, receipt_id, product_id, qty",
+		receiptId, productId, qty).Scan(&rr.ID, &rr.ReceiptId, &rr.ProductId, &rr.Qty)
 
 	if err != nil {
 		return rr, err
@@ -86,6 +110,12 @@ func GetReceipts(start, count int) ([]Receipt, error) {
 	}
 
 	return receipts, nil
+}
+
+func DeleteReceiptRow(id int) error {
+	_, err := DB.Exec("DELETE FROM receipt_table WHERE id=$1", id)
+
+	return err
 }
 
 func ChangeStatusReceipt(id int, status int) error {
