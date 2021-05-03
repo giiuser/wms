@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"database/sql"
 	"strconv"
+	"fmt"
 	"wms/app/model"
 
 	"encoding/json"
@@ -10,6 +12,50 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
+
+func GetReceipt(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid receipt ID")
+		return
+	}
+
+	product, err := model.GetReceipt(id)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Receipt not found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	} else {
+		fmt.Println(err)
+	}
+
+	respondWithJSON(w, http.StatusOK, product)
+}
+
+func GetReceipts(w http.ResponseWriter, r *http.Request) {
+	count, _ := strconv.Atoi(r.FormValue("count"))
+	start, _ := strconv.Atoi(r.FormValue("start"))
+
+	if count > 10 || count < 1 {
+		count = 10
+	}
+	if start < 0 {
+		start = 0
+	}
+
+	products, err := model.GetReceipts(start, count)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, products)
+}
 
 func CreateReceipt(w http.ResponseWriter, r *http.Request) {
 	var rec model.Receipt

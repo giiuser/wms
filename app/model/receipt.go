@@ -15,7 +15,7 @@ type ReceiptRow struct {
 
 func GetReceipt(id int) (Receipt, error) {
 	var r Receipt
-	row := DB.QueryRow("SELECT id, name FROM receipt WHERE id=$1", id)
+	row := DB.QueryRow("SELECT id, status FROM receipt WHERE id=$1", id)
 
 	if err := row.Scan(&r.ID, &r.Status); err != nil {
 		return r, err
@@ -66,7 +66,7 @@ func CreateReceiptRow(receiptId int, productId int, qty int) (ReceiptRow, error)
 
 func GetReceipts(start, count int) ([]Receipt, error) {
 	rows, err := DB.Query(
-		"SELECT id, name FROM receipt LIMIT $1 OFFSET $2",
+		"SELECT id, status FROM receipt LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -75,17 +75,17 @@ func GetReceipts(start, count int) ([]Receipt, error) {
 
 	defer rows.Close()
 
-	products := []Receipt{}
+	receipts := []Receipt{}
 
 	for rows.Next() {
-		var p Receipt
-		if err := rows.Scan(&p.ID); err != nil {
+		var r Receipt
+		if err := rows.Scan(&r.ID, &r.Status); err != nil {
 			return nil, err
 		}
-		products = append(products, p)
+		receipts = append(receipts, r)
 	}
 
-	return products, nil
+	return receipts, nil
 }
 
 func ChangeStatusReceipt(id int, status int) error {

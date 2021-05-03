@@ -5,6 +5,9 @@ import Home from './components/Home';
 import ProductIndex from './components/product/Index';
 import ProductCreate from './components/product/Create';
 import ProductEdit from './components/product/Edit';
+import ReceiptIndex from './components/receipt/Index';
+import ReceiptEdit from './components/receipt/Edit';
+
 import Axios from "axios";
 
 Axios.defaults.baseURL = 'http://localhost:8010';
@@ -57,29 +60,29 @@ export default new VueRouter({
         //     }
         // }
     },
-    // {
-    //     path: "/postings/new",
-    //     name: "newposting",
-    //     component: CreatePosting,
-    //     async beforeEnter(routeTo, routeFrom, next) {
-    //         try {
-    //             const response = await Axios.post("/api/postings");
+    { path: '/receipts', component: ReceiptIndex },
+    {
+        path: "/receipt/new",
+        name: "createreceipt",
+        component: ReceiptEdit,
+        // async beforeEnter(routeTo, routeFrom, next) {
+        //     try {
+        //         const response = await Axios.post("/receipt");
 
-    //             if (response.status !== 200) {
-    //                 throw "posting error";
-    //             }
+        //         if (response.status !== 200) {
+        //             throw "posting error";
+        //         }
 
-    //             next("/postings/" + response.data);
-    //         } catch (error) {
-    //             alert(error);
-    //         }
-    //     }
-    // },
+        //         next("/receipt/" + response.data);
+        //     } catch (error) {
+        //         alert(error);
+        //     }
+        // }
+    },
     // {
-    //     path: "/postings/:postingId",
-    //     name: "newpostingid",
-    //     component: CreatePosting,
-    //     beforeEnter: ifAuthenticated
+    //     path: "/receipt/:receiptId",
+    //     name: "editreceipt",
+    //     component: ReceiptEdit
     // },
  ]
 });

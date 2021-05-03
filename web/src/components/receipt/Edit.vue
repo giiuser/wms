@@ -1,8 +1,8 @@
 <template>
     <div class="content">
-        <loading :active.sync="isLoading" :is-full-page="fullPage"></loading>
+        <!-- <loading :active.sync="isLoading" :is-full-page="fullPage"></loading> -->
         <div class="card">
-            <div class="card-content">
+            <!-- <div class="card-content">
                 <div class="content">
                     <div class="content">
                         <b-select placeholder="На какой склад" v-model="toStock">
@@ -15,11 +15,12 @@
                         <p class="has-text-danger">Вы не выбрали склад!</p>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="card-content">
                 <div class="field has-addons mb-1">
                     <div class="control">
-                        <vue-simple-suggest
+                        <input class="input" type="text" :ref="'barcode'" @input="setBarcode" placeholder="Сканируйте штрихкод"  v-model="barcode">
+                        <!-- <vue-simple-suggest
                             ref="wmsSuggestComponent"
                             v-model="searchString"
                             value-attribute="key"
@@ -31,12 +32,12 @@
                             :prevent-submit="true"
                             :debounce="200"
                             @select="onSuggestSelect">
-                            <div slot="suggestion-item" slot-scope="{ suggestion, query }">
+                            <div slot="suggestion-item" slot-scope="{ suggestion }">
                                 <div>
                                     <span>{{ suggestion.name }}</span>
                                 </div>
                             </div>
-                        </vue-simple-suggest>
+                        </vue-simple-suggest> -->
                     </div>
                 </div>
             </div>
@@ -47,25 +48,17 @@
                     <table class="table">
                         <thead>
                         <th scope="col">Наименование</th>
-                        <th scope="col">Штрихкод</th>
                         <th scope="col">Кол-во</th>
-                        <th scope="col">Закупка</th>
                         <th scope="col">Удалить</th>
                         </thead>
                         <tbody>
                         <tr v-for="(item, key) in rowData" :key="key">
                             <td>{{ item.name }}</td>
-                            <td>{{ item.uid }}</td>
                             <td>
                                 <div class="quantity-toggle">
                                     <button @click="decrement(key)">&mdash;</button>
-                                        <input type="text" :value="item.qty" readonly>
+                                        <input type="text" :value="item.qty" readonly style="width:50px">
                                     <button @click="increment(key)">&#xff0b;</button>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="posting-price">
-                                    <input type="text" :value="item.price" @input="changePrice(key, $event)">
                                 </div>
                             </td>
                             <td><font-awesome-icon @click="deleteItem(key)" class="has-text-danger" icon="trash" /></td>
@@ -86,22 +79,15 @@
 </template>
 
 <script>
-    import {mapGetters} from 'vuex'
-    import VueSimpleSuggest from 'vue-simple-suggest'
-    import Loading from 'vue-loading-overlay'
-    import Axios from 'axios'
+    // import VueSimpleSuggest from 'vue-simple-suggest';
+    // import Loading from 'vue-loading-overlay';
+    import Axios from 'axios';
+
+    Axios.defaults.baseURL = 'http://localhost:8010';
 
     export default {
-        name: "CreatePosting",
-        computed: {
-            ...mapGetters(
-                {
-                    stocks: 'transfer/stock',
-                }),
-        },
+        name: "ReceiptEdit",
         async created() {
-            this.$store.dispatch('transfer/getStocks')
-
             if (this.$route.params.postingId !== 'new' && this.$route.params.postingId !== undefined) {
 
                 try {
@@ -121,6 +107,7 @@
             }
         },
         data: () => ({
+            barcode: '',
             isErr: false,
             searchString: '',
             error: null,
@@ -133,37 +120,26 @@
             status: false
         }),
         methods: {
-            async suggestionList(inputValue) {
-                const {data} = await Axios.get(
-                    '/api/wares/suggest',
-                    {
-                        params: {
-                            text: inputValue
+            setBarcode: async function () {
+                if (this.barcode !== '') {
+                    try {
+                        console.log(this.barcode);
+                        const response = await Axios.get('/product/' + this.barcode);
+                        response.data.qty = 1;
+                        this.rowData.push(response.data);
+                        console.log(this.rowData);
+                        this.barcode = ''
+                        this.$refs.barcode.focus()
+                    } catch (error) {
+                        if (error.response.data.error === 'wrong_ware') {
+                            this.noWare = true
+                        }
+                        if (error.response.data.error === 'no_item_on_cell') {
+                            this.noItemOnCell = true
                         }
                     }
-                )
-
-                this.suggestions = data.success.map(
-                    function (item, index) {
-                        return {
-                            key: index,
-                            uid: item.barcode,
-                            name: item.name,
-                            display: item.name
-                        }
-                    }
-                );
-                return this.suggestions
-            },
-            onSuggestSelect: async function (suggest) {
-                if (suggest) {
-                    this.rowData.push({
-                        uid:suggest.uid,
-                        name:suggest.name,
-                        qty:1
-                    })
-                    this.searchString = ''
-                    this.$refs.wmsSuggestComponent.hideList()
+                } else {
+                    console.log('error')
                 }
             },
             deleteItem: async function (key) {
@@ -191,14 +167,15 @@
                     }
                 )
                 this.isLoading = false
+                console.log(response);
             },
             changePrice(key, event) {
                 this.rowData[key].price = event.target.value
             }
         },
         components: {
-            VueSimpleSuggest,
-            Loading
+            // VueSimpleSuggest,
+            // Loading
         }
     }
 </script>

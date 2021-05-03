@@ -5,10 +5,6 @@
                 <b-input v-model="name"></b-input>
             </b-field>
 
-            <b-field label="Введите артикул">
-                <b-input v-model="article"></b-input>
-            </b-field>
-
             <b-field v-if="errors.length">
                 <ul>
                     <li v-for="(error, key) in errors" :key="key">{{ error }}</li>
@@ -16,7 +12,7 @@
             </b-field>
 
             <b-field>
-                <a class="button is-success" @click="newWare">Создать</a>
+                <a class="button is-success" @click="create">Создать</a>
             </b-field>
         </section>
     </div>
@@ -28,30 +24,23 @@ import Axios from "axios";
 Axios.defaults.baseURL = 'http://localhost:8010';
 
 export default {
-    name: "CreateWare",
+    name: "ProductCreate",
     data: () => ({
         name: "",
-        article: "",
-        color: 0,
-        size: 0,
-        colors: [],
-        sizes: [],
         errors: []
     }),
     methods: {
         loadAsyncData: function() {
 
         },
-        newWare: function() {
+        create: function() {
             if (this.checkForm() === true) {
-                Axios.post("/api/wares", {
-                    name: this.name,
-                    article: this.article,
-                    color: this.color,
-                    size: this.size
+                Axios.post("/product", {
+                    name: this.name
                 })
                     .then(response => {
-                        this.$router.push("/wares");
+                        console.log(response)
+                        this.$router.push("/products");
                     })
                     .catch(error => {
                         console.log(error);
@@ -59,7 +48,7 @@ export default {
             }
         },
         checkForm: function() {
-            if (this.name && this.article && this.color && this.size) {
+            if (this.name) {
                 return true;
             }
 
@@ -68,19 +57,10 @@ export default {
             if (!this.name) {
                 this.errors.push("Требуется указать имя.");
             }
-            if (!this.article) {
-                this.errors.push("Требуется указать артикул.");
-            }
-            if (!this.color) {
-                this.errors.push("Требуется указать цвет.");
-            }
-            if (!this.size) {
-                this.errors.push("Требуется указать размер.");
-            }
         }
     },
     mounted() {
-        this.loadAsyncData();
+        
     }
 };
 </script>

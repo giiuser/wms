@@ -11,6 +11,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"wms/app/controller"
+	"fmt"
 )
 
 type App struct {
@@ -21,16 +22,19 @@ func CORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// Set headers
-		w.Header().Set("Access-Control-Allow-Headers:", "*")
+		// w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		// w.Header().Set("Access-Control-Allow-Headers:", "*")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+    	w.Header().Set("Content-Type", "application/json")
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
 
-		// fmt.Println("ok")
+		fmt.Println("ok")
 
 		// Next
 		next.ServeHTTP(w, r)
@@ -50,24 +54,26 @@ func (a *App) Run(addr string) {
 
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/products", controller.GetProducts).Methods("GET")
-	a.Router.HandleFunc("/product", controller.CreateProduct).Methods("POST")
+	a.Router.HandleFunc("/product", controller.CreateProduct).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/product/{id:[0-9]+}", controller.GetProduct).Methods("GET")
-	a.Router.HandleFunc("/product/{id:[0-9]+}", controller.UpdateProduct).Methods("PUT")
-	a.Router.HandleFunc("/product/{id:[0-9]+}", controller.DeleteProduct).Methods("DELETE")
+	a.Router.HandleFunc("/product/{id:[0-9]+}", controller.UpdateProduct).Methods("PUT", "OPTIONS")
+	a.Router.HandleFunc("/product/{id:[0-9]+}", controller.DeleteProduct).Methods("DELETE", "OPTIONS")
 
-	a.Router.HandleFunc("/receipt", controller.CreateReceipt).Methods("POST")
-	a.Router.HandleFunc("/receiptrow", controller.CreateReceiptRow).Methods("POST")
-	a.Router.HandleFunc("/receipt/{id:[0-9]+}", controller.ChangeStatusReceipt).Methods("PATCH")
+	a.Router.HandleFunc("/receipts", controller.GetReceipts).Methods("GET")
+	a.Router.HandleFunc("/receipt", controller.CreateReceipt).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/receipt/{id:[0-9]+}", controller.GetReceipt).Methods("GET")
+	a.Router.HandleFunc("/receiptrow", controller.CreateReceiptRow).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/receipt/{id:[0-9]+}", controller.ChangeStatusReceipt).Methods("PATCH", "OPTIONS")
 
-	a.Router.HandleFunc("/waybill", controller.CreateWaybill).Methods("POST")
-	a.Router.HandleFunc("/waybillrow", controller.CreateWaybillRow).Methods("POST")
-	a.Router.HandleFunc("/waybill/{id:[0-9]+}", controller.ChangeStatusWaybill).Methods("PATCH")
+	a.Router.HandleFunc("/waybill", controller.CreateWaybill).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/waybillrow", controller.CreateWaybillRow).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/waybill/{id:[0-9]+}", controller.ChangeStatusWaybill).Methods("PATCH", "OPTIONS")
 
-	a.Router.HandleFunc("/allocation", controller.CreateAllocation).Methods("POST")
-	a.Router.HandleFunc("/allocationrow", controller.CreateAllocationRow).Methods("POST")
-	a.Router.HandleFunc("/allocation/{id:[0-9]+}", controller.ChangeStatusAllocation).Methods("PATCH")
+	a.Router.HandleFunc("/allocation", controller.CreateAllocation).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/allocationrow", controller.CreateAllocationRow).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/allocation/{id:[0-9]+}", controller.ChangeStatusAllocation).Methods("PATCH", "OPTIONS")
 
-	a.Router.HandleFunc("/collect", controller.CreateCollect).Methods("POST")
-	a.Router.HandleFunc("/collectrow", controller.CreateCollectRow).Methods("POST")
-	a.Router.HandleFunc("/collect/{id:[0-9]+}", controller.ChangeStatusCollect).Methods("PATCH")
+	a.Router.HandleFunc("/collect", controller.CreateCollect).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/collectrow", controller.CreateCollectRow).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/collect/{id:[0-9]+}", controller.ChangeStatusCollect).Methods("PATCH", "OPTIONS")
 }
