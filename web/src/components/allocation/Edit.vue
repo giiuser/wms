@@ -151,7 +151,7 @@
                 }
             },
             posting: async function () {
-                await Axios.patch('/receipt/' + this.$route.params.receiptId,
+                await Axios.patch('/allocation/' + this.$route.params.allocationId,
                     {
                         status: this.status == 2 ? 1 : 2
                     }

@@ -102,9 +102,9 @@ func ChangeStatusAllocation(id int, status int) error {
 		status, id)
 
 	if status == 2 {
-		MakeCellPosting(id, "allocation", false)
-	} else if status == 1 {
 		MakeCellPosting(id, "allocation", true)
+	} else if status == 1 {
+		MakeCellPosting(id, "allocation", false)
 	}
 
 	return err

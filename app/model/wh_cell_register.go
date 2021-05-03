@@ -21,10 +21,12 @@ type cellProduct struct {
 }
 
 func MakeCellPosting(documentId int, documentType string, direction bool) error {
-	query := fmt.Sprintf("SELECT product_id, qty, cell FROM %s_table WHERE %s_id=%d", documentType, documentType, documentId)
+
+	query := fmt.Sprintf("SELECT cell_id, product_id, qty FROM %s_table WHERE %s_id=%d", documentType, documentType, documentId)
 	rows, err := DB.Query(query)
 
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	defer rows.Close()
@@ -32,7 +34,6 @@ func MakeCellPosting(documentId int, documentType string, direction bool) error 
 	for rows.Next() {
 		var p cellProduct
 		if err := rows.Scan(&p.cellId, &p.productId, &p.qty); err != nil {
-			fmt.Println(err)
 			return err
 		}
 		qty := p.qty
@@ -49,10 +50,11 @@ func createCellRow(cellId int, productId int, qty int, documentId int, documentT
 	var wcr WhCellRegister
 
 	err := DB.QueryRow(
-		"INSERT INTO wh_cell_register(product_id, qty, document_id, document_type) VALUES($1, $2, $3, $4) RETURNING id",
+		"INSERT INTO wh_cell_register(cell_id, product_id, qty, document_id, document_type) VALUES($1, $2, $3, $4, $5) RETURNING id",
 		cellId, productId, qty, documentId, documentType).Scan(&wcr.ID)
 
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
