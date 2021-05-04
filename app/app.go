@@ -70,14 +70,20 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/waybillrow", controller.CreateWaybillRow).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/waybill/{id:[0-9]+}", controller.ChangeStatusWaybill).Methods("PATCH", "OPTIONS")
 
+	a.Router.HandleFunc("/allocations", controller.GetAllocations).Methods("GET")
 	a.Router.HandleFunc("/allocation", controller.CreateAllocation).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/allocation/{id:[0-9]+}", controller.GetAllocation).Methods("GET")
 	a.Router.HandleFunc("/allocation/{id:[0-9]+}", controller.UpdateAllocation).Methods("PUT", "OPTIONS")
 	a.Router.HandleFunc("/allocationrow", controller.CreateAllocationRow).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/allocationrow/{id:[0-9]+}", controller.UpdateAllocationRow).Methods("PUT", "OPTIONS")
+	a.Router.HandleFunc("/allocation/{id:[0-9]+}", controller.DeleteAllocation).Methods("DELETE", "OPTIONS")
+	a.Router.HandleFunc("/allocationrows/{id:[0-9]+}", controller.DeleteAllocationRows).Methods("DELETE", "OPTIONS")
 	a.Router.HandleFunc("/allocation/{id:[0-9]+}", controller.ChangeStatusAllocation).Methods("PATCH", "OPTIONS")
 
+	a.Router.HandleFunc("/collects", controller.GetCollects).Methods("GET")
 	a.Router.HandleFunc("/collect", controller.CreateCollect).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/collect/{id:[0-9]+}", controller.GetCollect).Methods("GET")
 	a.Router.HandleFunc("/collectrow", controller.CreateCollectRow).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/collectrow/{id:[0-9]+}", controller.DeleteCollectRow).Methods("DELETE", "OPTIONS")
 	a.Router.HandleFunc("/collect/{id:[0-9]+}", controller.ChangeStatusCollect).Methods("PATCH", "OPTIONS")
 }

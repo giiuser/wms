@@ -37,6 +37,26 @@ func GetAllocation(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, product)
 }
 
+func GetAllocations(w http.ResponseWriter, r *http.Request) {
+	count, _ := strconv.Atoi(r.FormValue("count"))
+	start, _ := strconv.Atoi(r.FormValue("start"))
+
+	if count > 10 || count < 1 {
+		count = 10
+	}
+	if start < 0 {
+		start = 0
+	}
+
+	products, err := model.GetAllocations(start, count)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, products)
+}
+
 func CreateAllocation(w http.ResponseWriter, r *http.Request) {
 	var a model.Allocation
 	decoder := json.NewDecoder(r.Body)
@@ -148,4 +168,36 @@ func ChangeStatusAllocation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusOK, a)
+}
+
+func DeleteAllocation(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Allocation ID")
+		return
+	}
+
+	if err := model.DeleteAllocation(id); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+func DeleteAllocationRows(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Allocation ID")
+		return
+	}
+
+	if err := model.DeleteAllocationRows(id); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }

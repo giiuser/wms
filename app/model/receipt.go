@@ -48,6 +48,30 @@ func GetReceipt(id int) (Receipt, error) {
 	return r, nil
 }
 
+func GetReceipts(start, count int) ([]Receipt, error) {
+	rows, err := DB.Query(
+		"SELECT id, status FROM receipt LIMIT $1 OFFSET $2",
+		count, start)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	receipts := []Receipt{}
+
+	for rows.Next() {
+		var r Receipt
+		if err := rows.Scan(&r.ID, &r.Status); err != nil {
+			return nil, err
+		}
+		receipts = append(receipts, r)
+	}
+
+	return receipts, nil
+}
+
 func UpdateReceipt(id int, name string) error {
 	_, err := DB.Exec("UPDATE receipt SET name=$1 WHERE id=$2",
 		name, id)
@@ -86,30 +110,6 @@ func CreateReceiptRow(receiptId int, productId int, qty int) (ReceiptRow, error)
 	}
 
 	return rr, nil
-}
-
-func GetReceipts(start, count int) ([]Receipt, error) {
-	rows, err := DB.Query(
-		"SELECT id, status FROM receipt LIMIT $1 OFFSET $2",
-		count, start)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	receipts := []Receipt{}
-
-	for rows.Next() {
-		var r Receipt
-		if err := rows.Scan(&r.ID, &r.Status); err != nil {
-			return nil, err
-		}
-		receipts = append(receipts, r)
-	}
-
-	return receipts, nil
 }
 
 func DeleteReceiptRow(id int) error {

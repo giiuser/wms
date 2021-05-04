@@ -20,6 +20,7 @@
                     <table class="table">
                         <thead>
                         <th scope="col">Наименование</th>
+                        <th scope="col">Производитель</th>
                         <th scope="col">Кол-во</th>
                         <th scope="col">Стеллаж</th>
                         <th scope="col">Удалить</th>
@@ -27,13 +28,14 @@
                         <tbody>
                         <tr v-for="(item, key) in rowData" :key="key">
                             <td>{{ item.name }}</td>
+                            <td>{{ item.brand }}</td>
                             <td>{{ item.qty }}</td>
                             <td>
                                 <div>
                                     <input type="text" @input="setCell(item.id, $event.target.value)" :value="item.cell_id" style="width:50px">
                                 </div>
                             </td>
-                            <td><font-awesome-icon @click="deleteRow(item.id, key)" class="has-text-danger" icon="trash" /></td>
+                            <td><font-awesome-icon v-if="status === 0" @click="deleteRow(item.id, key)" class="has-text-danger" icon="trash" /></td>
                         </tr>
                         </tbody>
                     </table>
@@ -65,12 +67,12 @@
                     const response = await Axios.get('/allocation/' + this.$route.params.allocationId)
 
                     if (response.status !== 200) {
-                        throw 'receipt not available'
+                        throw 'allocation not available';
                     }
 
-                    this.status = response.data.status
-                    this.rowData = response.data.products
-                    this.documentId = response.data.id
+                    this.status = response.data.status;
+                    this.rowData = response.data.products;
+                    this.documentId = response.data.id;
                     console.log(this.documentId);
                 } catch (error) {
                     console.log(error)
@@ -97,6 +99,8 @@
             setBaseDocumentId: async function () {
                 if (this.baseDocumentId !== '') {
                     try {
+                        await Axios.delete('/allocationrows/' + this.documentId);
+                        this.rowData = [];
                         const response = await Axios.get('/receipt/' + this.baseDocumentId);
                         await Axios.put('/allocation/' + this.documentId, {
                             document_id: Number(this.documentId),
@@ -107,6 +111,7 @@
                             console.log(response.data.products[key]);
                             row.id = response.data.products[key].id;
                             row.name = response.data.products[key].name;
+                            row.brand = response.data.products[key].brand;
                             row.product_id = response.data.products[key].product_id;
                             row.qty = response.data.products[key].qty;
                             row.cell = '';
@@ -118,17 +123,6 @@
                                 cell_id: 0
                             });
                         }
-                        // response.data.qty = 1; 
-                        // this.barcode = '';
-                        // this.$refs.barcode.focus();
-                        // const responseRow = await Axios.post('/receiptrow', {
-                        //     receipt_id: this.documentId,
-                        //     product_id: response.data.id,
-                        //     qty: response.data.qty
-                        // });
-                        // response.data.id = responseRow.data.id;
-                        // this.rowData.push(response.data);
-                        // console.log(this.rowData);
                     } catch (error) {
                         console.log(error);
                     }

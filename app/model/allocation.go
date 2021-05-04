@@ -1,7 +1,10 @@
 package model
 
+import "time"
+
 type Allocation struct {
 	ID           int             `json:"id"`
+	CreatedAt    time.Time       `json:"created_at"`
 	Status       int             `json:"status"`
 	DocumentId   int             `json:"document_id"`
 	DocumentType string          `json:"document_type"`
@@ -11,6 +14,7 @@ type Allocation struct {
 type AllocationRow struct {
 	ID           int    `json:"id"`
 	Name         string `json:"name"`
+	Brand        string `json:"brand"`
 	AllocationId int    `json:"allocation_id"`
 	ProductId    int    `json:"product_id"`
 	Qty          int    `json:"qty"`
@@ -26,7 +30,7 @@ func GetAllocation(id int) (Allocation, error) {
 	}
 
 	rows, err := DB.Query(
-		"SELECT at.id, p.name, at.allocation_id, at.product_id, at.qty, at.cell_id FROM allocation_table at JOIN product p ON p.id = at.product_id WHERE allocation_id=$1",
+		"SELECT at.id, p.name, p.brand, at.allocation_id, at.product_id, at.qty, at.cell_id FROM allocation_table at JOIN product p ON p.id = at.product_id WHERE allocation_id=$1",
 		id)
 
 	if err != nil {
@@ -39,7 +43,7 @@ func GetAllocation(id int) (Allocation, error) {
 
 	for rows.Next() {
 		var ar AllocationRow
-		if err := rows.Scan(&ar.ID, &ar.Name, &ar.AllocationId, &ar.ProductId, &ar.Qty, &ar.CellId); err != nil {
+		if err := rows.Scan(&ar.ID, &ar.Name, &ar.Brand, &ar.AllocationId, &ar.ProductId, &ar.Qty, &ar.CellId); err != nil {
 			return a, err
 		}
 		products = append(products, ar)
@@ -47,6 +51,30 @@ func GetAllocation(id int) (Allocation, error) {
 	a.Products = products
 
 	return a, nil
+}
+
+func GetAllocations(start, count int) ([]Allocation, error) {
+	rows, err := DB.Query(
+		"SELECT id, status, created_at FROM allocation LIMIT $1 OFFSET $2",
+		count, start)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	allocations := []Allocation{}
+
+	for rows.Next() {
+		var a Allocation
+		if err := rows.Scan(&a.ID, &a.Status, &a.CreatedAt); err != nil {
+			return nil, err
+		}
+		allocations = append(allocations, a)
+	}
+
+	return allocations, nil
 }
 
 func UpdateAllocation(id int, documentId int, documentType string) error {
@@ -106,6 +134,12 @@ func ChangeStatusAllocation(id int, status int) error {
 	} else if status == 1 {
 		MakeCellPosting(id, "allocation", false)
 	}
+
+	return err
+}
+
+func DeleteAllocationRows(id int) error {
+	_, err := DB.Exec("DELETE FROM allocation_table WHERE allocation_id=$1", id)
 
 	return err
 }

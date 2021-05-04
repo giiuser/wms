@@ -7,7 +7,10 @@ import ProductCreate from './components/product/Create';
 import ProductEdit from './components/product/Edit';
 import ReceiptIndex from './components/receipt/Index';
 import ReceiptEdit from './components/receipt/Edit';
+import AllocationIndex from './components/allocation/Index';
 import AllocationEdit from './components/allocation/Edit';
+import CollectIndex from './components/collect/Index';
+import CollectEdit from './components/collect/Edit';
 
 import Axios from "axios";
 
@@ -85,6 +88,7 @@ export default new VueRouter({
         name: "editreceipt",
         component: ReceiptEdit
     },
+    { path: '/allocations', component: AllocationIndex },
     {
         path: "/allocation/new",
         name: "createallocation",
@@ -107,6 +111,30 @@ export default new VueRouter({
         path: "/allocation/:allocationId",
         name: "editallocation",
         component: AllocationEdit
+    },
+    { path: '/collects', component: CollectIndex },
+    {
+        path: "/collect/new",
+        name: "createcollect",
+        component: CollectEdit,
+        async beforeEnter(routeTo, routeFrom, next) {
+            try {
+                const response = await Axios.post("/collect", {});
+
+                if (response.status !== 201) {
+                    throw "posting error";
+                }
+
+                next("/collect/" + response.data.id);
+            } catch (error) {
+                alert(error);
+            }
+        }
+    },
+    {
+        path: "/collect/:collectId",
+        name: "editcollect",
+        component: CollectEdit
     },
  ]
 });
