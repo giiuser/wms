@@ -5,12 +5,14 @@ go 1.16
 require (
 	cloud.google.com/go/spanner v1.18.0 // indirect
 	cloud.google.com/go/storage v1.15.0 // indirect
+	github.com/Bowery/prompt v0.0.0-20190916142128-fa8279994f75 // indirect
 	github.com/ClickHouse/clickhouse-go v1.4.5 // indirect
 	github.com/apache/arrow/go/arrow v0.0.0-20210508110107-050f72c84f0c // indirect
 	github.com/aws/aws-sdk-go v1.38.36 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.1.4 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.0 // indirect
 	github.com/cockroachdb/cockroach-go v2.0.1+incompatible // indirect
+	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185 // indirect
 	github.com/denisenkom/go-mssqldb v0.10.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gocql/gocql v0.0.0-20210504150947-558dfae50b5d // indirect
@@ -18,6 +20,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/flatbuffers v1.12.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -25,6 +28,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.0 // indirect
 	github.com/k0kubun/pp v3.0.1+incompatible // indirect
+	github.com/kardianos/govendor v1.0.9 // indirect
 	github.com/klauspost/compress v1.12.2 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -52,6 +56,7 @@ require (
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	google.golang.org/api v0.46.0 // indirect
 	google.golang.org/genproto v0.0.0-20210506142907-4a47615972c2 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	modernc.org/b v1.0.1 // indirect
 	modernc.org/db v1.0.1 // indirect
 	modernc.org/file v1.0.2 // indirect
