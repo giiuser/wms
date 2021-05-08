@@ -48,8 +48,8 @@ func (a *App) Initialize() {
 	a.initializeRoutes()
 }
 
-func (a *App) Run(port string, addr string) {
-	log.Fatal(http.ListenAndServe(port, a.Router))
+func (a *App) Run(addr string) {
+	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
 
 func (a *App) initializeRoutes() {
