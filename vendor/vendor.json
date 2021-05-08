@@ -1,0 +1,23 @@
+{
+	"comment": "",
+	"ignore": "",
+	"package": [
+		{
+			"checksumSHA1": "epRhaYCjtPA2QrkvlX4eyLHHfvs=",
+			"path": "github.com/golang-migrate/migrate",
+			"revision": "c4d82aa89aeaf6f2689f90bee623b1157ee4d8fa",
+			"revisionTime": "2021-05-07T05:35:36Z"
+		},
+		{
+			"path": "github.com/golang-migrate/migrate/v4/source/stub",
+			"revision": "c4d82aa89aeaf6f2689f90bee623b1157ee4d8fa"
+		}
+	],
+	"rootPath": "wms",
+	"heroku" : {
+		"install": [
+		  "./cmd/...",
+		  "github.com/golang-migrate/migrate"
+		]
+	}
+}
