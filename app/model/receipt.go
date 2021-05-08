@@ -2,9 +2,15 @@
 
 package model
 
+import (
+	"time"
+)
+
 type Receipt struct {
-	ID       int          `json:"id"`
-	Status   int          `json:"status"`
+	BaseModel
+	// ID        int          `json:"id"`
+	Status int `json:"status"`
+	// CreatedAt time.Time    `json:"created_at"`
 	Products []ReceiptRow `json:"products"`
 }
 
@@ -50,7 +56,7 @@ func GetReceipt(id int) (Receipt, error) {
 
 func GetReceipts(start, count int) ([]Receipt, error) {
 	rows, err := DB.Query(
-		"SELECT id, status FROM receipt LIMIT $1 OFFSET $2",
+		"SELECT id, status, created_at, updated_at FROM receipt LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -63,7 +69,7 @@ func GetReceipts(start, count int) ([]Receipt, error) {
 
 	for rows.Next() {
 		var r Receipt
-		if err := rows.Scan(&r.ID, &r.Status); err != nil {
+		if err := rows.Scan(&r.ID, &r.Status, &r.CreatedAt, &r.UpdatedAt); err != nil {
 			return nil, err
 		}
 		receipts = append(receipts, r)
@@ -73,8 +79,8 @@ func GetReceipts(start, count int) ([]Receipt, error) {
 }
 
 func UpdateReceipt(id int, name string) error {
-	_, err := DB.Exec("UPDATE receipt SET name=$1 WHERE id=$2",
-		name, id)
+	_, err := DB.Exec("UPDATE receipt SET name=$1, updated_at=$2 WHERE id=$2",
+		name, time.Now(), id)
 
 	return err
 }
@@ -119,8 +125,8 @@ func DeleteReceiptRow(id int) error {
 }
 
 func ChangeStatusReceipt(id int, status int) error {
-	_, err := DB.Exec("UPDATE receipt SET status=$1 WHERE id=$2",
-		status, id)
+	_, err := DB.Exec("UPDATE receipt SET status=$1, updated_at=$2 WHERE id=$3",
+		status, time.Now(), id)
 
 	if status == 2 {
 		MakePosting(id, "receipt", true)

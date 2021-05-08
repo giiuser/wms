@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS "waybill" (
   "status" smallint NOT NULL DEFAULT 0,
   "document_id" bigint NOT NULL,
   "document_type" varchar NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT (now())
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "updated_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE IF NOT EXISTS "waybill_table" (

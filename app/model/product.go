@@ -2,11 +2,7 @@
 
 package model
 
-import (
-	"database/sql"
-)
-
-var DB *sql.DB
+// var DB *sql.DB
 
 type Product struct {
 	ID    int    `json:"id"`
@@ -64,6 +60,28 @@ func GetProducts(start, count int) ([]Product, error) {
 
 	products := []Product{}
 
+	for rows.Next() {
+		var p Product
+		if err := rows.Scan(&p.ID, &p.Name, &p.Brand); err != nil {
+			return nil, err
+		}
+		products = append(products, p)
+	}
+
+	return products, nil
+}
+
+func GetProductsByName(name string) ([]Product, error) {
+	rows, err := DB.Query(
+		"SELECT id, name, brand FROM product WHERE name ILIKE '%'||$1||'%'", name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	products := []Product{}
 	for rows.Next() {
 		var p Product
 		if err := rows.Scan(&p.ID, &p.Name, &p.Brand); err != nil {

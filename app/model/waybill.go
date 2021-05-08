@@ -1,32 +1,61 @@
 package model
 
+import (
+	"time"
+)
+
 type Waybill struct {
-	ID           int    `json:"id"`
-	Status       int    `json:"status"`
-	DocumentId   int    `json:"document_id"`
-	DocumentType string `json:"document_type"`
+	BaseModel
+	Status       int          `json:"status"`
+	DocumentId   int          `json:"document_id"`
+	DocumentType string       `json:"document_type"`
+	Products     []WaybillRow `json:"products"`
 }
 
 type WaybillRow struct {
-	WaybillId int `json:"waybill_id"`
-	ProductId int `json:"product_id"`
-	Qty       int `json:"qty"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Brand     string `json:"brand"`
+	WaybillId int    `json:"waybill_id"`
+	ProductId int    `json:"product_id"`
+	Qty       int    `json:"qty"`
 }
 
-func GetWaybill(id int) (Receipt, error) {
-	var r Receipt
-	row := DB.QueryRow("SELECT id, name FROM waybill WHERE id=$1", id)
+func GetWaybill(id int) (Waybill, error) {
+	var wb Waybill
+	row := DB.QueryRow("SELECT id, status, document_id, document_type FROM waybill WHERE id=$1", id)
 
-	if err := row.Scan(&r.ID, &r.Status); err != nil {
-		return r, err
+	if err := row.Scan(&wb.ID, &wb.Status, &wb.DocumentId, &wb.DocumentType); err != nil {
+		return wb, err
 	}
 
-	return r, nil
+	rows, err := DB.Query(
+		"SELECT wt.id, p.name, p.brand, wt.waybill_id, wt.product_id, wt.qty FROM waybill_table wt JOIN product p ON p.id = wt.product_id WHERE waybill_id=$1",
+		id)
+
+	if err != nil {
+		return wb, err
+	}
+
+	defer rows.Close()
+
+	products := []WaybillRow{}
+
+	for rows.Next() {
+		var wbr WaybillRow
+		if err := rows.Scan(&wbr.ID, &wbr.Name, &wbr.Brand, &wbr.WaybillId, &wbr.ProductId, &wbr.Qty); err != nil {
+			return wb, err
+		}
+		products = append(products, wbr)
+	}
+	wb.Products = products
+
+	return wb, nil
 }
 
-func UpdateWaybill(id int, name string) error {
-	_, err := DB.Exec("UPDATE waybill SET name=$1 WHERE id=$2",
-		name, id)
+func UpdateWaybill(id int, documentId int, documentType string) error {
+	_, err := DB.Exec("UPDATE waybill SET document_id=$1, document_type=$2, updated_at=$3 WHERE id=$4",
+		documentId, documentType, time.Now(), id)
 
 	return err
 }
@@ -65,9 +94,9 @@ func CreateWaybillRow(waybillId int, productId int, qty int) (WaybillRow, error)
 	return wbr, nil
 }
 
-func GetWaybills(start, count int) ([]Receipt, error) {
+func GetWaybills(start, count int) ([]Waybill, error) {
 	rows, err := DB.Query(
-		"SELECT id, name FROM waybill LIMIT $1 OFFSET $2",
+		"SELECT id, status, document_id, document_type, created_at, updated_at FROM waybill LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -76,28 +105,34 @@ func GetWaybills(start, count int) ([]Receipt, error) {
 
 	defer rows.Close()
 
-	products := []Receipt{}
+	products := []Waybill{}
 
 	for rows.Next() {
-		var p Receipt
-		if err := rows.Scan(&p.ID); err != nil {
+		var wb Waybill
+		if err := rows.Scan(&wb.ID, &wb.Status, &wb.DocumentId, &wb.DocumentType, &wb.CreatedAt, &wb.UpdatedAt); err != nil {
 			return nil, err
 		}
-		products = append(products, p)
+		products = append(products, wb)
 	}
 
 	return products, nil
 }
 
 func ChangeStatusWaybill(id int, status int) error {
-	_, err := DB.Exec("UPDATE waybill SET status=$1 WHERE id=$2",
-		status, id)
+	_, err := DB.Exec("UPDATE waybill SET status=$1, updated_at=$2 WHERE id=$3",
+		status, time.Now(), id)
 
 	if status == 2 {
 		MakePosting(id, "waybill", false)
 	} else if status == 1 {
 		MakePosting(id, "waybill", true)
 	}
+
+	return err
+}
+
+func DeleteWaybillRows(id int) error {
+	_, err := DB.Exec("DELETE FROM waybill_table WHERE waybill_id=$1", id)
 
 	return err
 }

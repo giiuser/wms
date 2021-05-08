@@ -4,7 +4,7 @@
             <div class="card-content">
                 <div class="field has-addons mb-1">
                     <div class="control">
-                        <input class="input" type="text" :ref="'barcode'" @input="setBarcode" placeholder="Сканируйте штрихкод"  v-model="barcode">
+                        <input class="input" type="text" :ref="'barcode'" @input="setBarcode" placeholder="Сканируйте штрихкод"  v-model="barcode" :disabled="this.status === 2">
                     </div>
                 </div>
             </div>
@@ -15,14 +15,22 @@
                     <table class="table">
                         <thead>
                         <th scope="col">Наименование</th>
+                        <th scope="col">Производитель</th>
                         <th scope="col">Кол-во</th>
+                        <th scope="col">Полка</th>
                         <th scope="col">Удалить</th>
                         </thead>
                         <tbody>
                         <tr v-for="(item, key) in rowData" :key="key">
                             <td>{{ item.name }}</td>
+                            <td>{{ item.brand }}</td>
                             <td>{{ item.qty }}</td>
-                            <td><font-awesome-icon @click="deleteRow(item.id, key)" class="has-text-danger" icon="trash" /></td>
+                            <td>
+                                <div>
+                                    <input type="text" @input="setCell(item.id, $event.target.value)" :value="item.cell_name.String" style="width:50px" :disabled="status === 2">
+                                </div>
+                            </td>
+                            <td><font-awesome-icon v-if="status !== 2" @click="deleteRow(item.id, key)" class="has-text-danger" icon="trash" /></td>
                         </tr>
                         </tbody>
                     </table>
@@ -34,7 +42,7 @@
                 <p>
                     <a class="button is-success is-rounded" @click="posting()">{{ this.status == 2 ? 'Распровести' : 'Провести' }}</a>
                     &nbsp;&nbsp;&nbsp;
-                    <a class="button is-primary is-rounded" @click="createAllocation()">Создать накладную на отгрузку</a>
+                    <a class="button is-primary is-rounded" v-if="this.status == 2" @click="createWaybill()">Создать накладную на отгрузку</a>
                 </p>
             </div>
         </div>
@@ -55,7 +63,7 @@
                     const response = await Axios.get('/collect/' + this.$route.params.collectId)
 
                     if (response.status !== 200) {
-                        throw 'receipt not available'
+                        throw 'collect not available'
                     }
 
                     this.status = response.data.status
@@ -96,6 +104,8 @@
                         });
                         response.data.id = responseRow.data.id;
                         response.data.cell_id = 0;
+                        response.data.cell_name = '';
+                        console.log(response.data);
                         this.rowData.push(response.data);
                         console.log(this.rowData);
                     } catch (error) {
@@ -120,17 +130,25 @@
                 }
             },
             posting: async function () {
-                await Axios.patch('/collect/' + this.$route.params.receiptId,
+                await Axios.patch('/collect/' + this.$route.params.collectId,
                     {
                         status: this.status == 2 ? 1 : 2
                     }
                 )
                 this.status = this.status == 2 ? 1 : 2
             },
-            createAllocation() {
-                this.$store.dispatch('allocation/setDocumentId', this.documentId);
-                this.$router.push('/allocation/new').catch(() => {});
-            }
+            createWaybill() {
+                this.$store.dispatch('waybill/setDocumentId', this.documentId);
+                this.$router.push('/waybill/new').catch(() => {});
+            },
+            setCell: async function (id, key) {
+                console.log(id,key);
+                await Axios.put('/collectrow/' + id,
+                    {
+                        cell_id: Number(key)
+                    }
+                )
+            },
         },
         components: {
 

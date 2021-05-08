@@ -53,11 +53,16 @@ func (a *App) Run(addr string) {
 }
 
 func (a *App) initializeRoutes() {
+	a.Router.HandleFunc("/cells", controller.GetCells).Methods("GET")
+	a.Router.HandleFunc("/cell", controller.CreateCell).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/cell/{id:[0-9]+}", controller.DeleteCell).Methods("DELETE", "OPTIONS")
+
 	a.Router.HandleFunc("/products", controller.GetProducts).Methods("GET")
 	a.Router.HandleFunc("/product", controller.CreateProduct).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/product/{id:[0-9]+}", controller.GetProduct).Methods("GET")
 	a.Router.HandleFunc("/product/{id:[0-9]+}", controller.UpdateProduct).Methods("PUT", "OPTIONS")
 	a.Router.HandleFunc("/product/{id:[0-9]+}", controller.DeleteProduct).Methods("DELETE", "OPTIONS")
+	a.Router.HandleFunc("/productsearch/", controller.SearchProduct).Methods("GET")
 
 	a.Router.HandleFunc("/receipts", controller.GetReceipts).Methods("GET")
 	a.Router.HandleFunc("/receipt", controller.CreateReceipt).Methods("POST", "OPTIONS")
@@ -65,10 +70,6 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/receiptrow", controller.CreateReceiptRow).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/receiptrow/{id:[0-9]+}", controller.DeleteReceiptRow).Methods("DELETE", "OPTIONS")
 	a.Router.HandleFunc("/receipt/{id:[0-9]+}", controller.ChangeStatusReceipt).Methods("PATCH", "OPTIONS")
-
-	a.Router.HandleFunc("/waybill", controller.CreateWaybill).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/waybillrow", controller.CreateWaybillRow).Methods("POST", "OPTIONS")
-	a.Router.HandleFunc("/waybill/{id:[0-9]+}", controller.ChangeStatusWaybill).Methods("PATCH", "OPTIONS")
 
 	a.Router.HandleFunc("/allocations", controller.GetAllocations).Methods("GET")
 	a.Router.HandleFunc("/allocation", controller.CreateAllocation).Methods("POST", "OPTIONS")
@@ -84,6 +85,18 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/collect", controller.CreateCollect).Methods("POST", "OPTIONS")
 	a.Router.HandleFunc("/collect/{id:[0-9]+}", controller.GetCollect).Methods("GET")
 	a.Router.HandleFunc("/collectrow", controller.CreateCollectRow).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/collectrow/{id:[0-9]+}", controller.UpdateCollectRow).Methods("PUT", "OPTIONS")
 	a.Router.HandleFunc("/collectrow/{id:[0-9]+}", controller.DeleteCollectRow).Methods("DELETE", "OPTIONS")
 	a.Router.HandleFunc("/collect/{id:[0-9]+}", controller.ChangeStatusCollect).Methods("PATCH", "OPTIONS")
+
+	a.Router.HandleFunc("/waybills", controller.GetWaybills).Methods("GET")
+	a.Router.HandleFunc("/waybill", controller.CreateWaybill).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/waybill/{id:[0-9]+}", controller.GetWaybill).Methods("GET")
+	a.Router.HandleFunc("/waybill/{id:[0-9]+}", controller.UpdateWaybill).Methods("PUT", "OPTIONS")
+	a.Router.HandleFunc("/waybillrow", controller.CreateWaybillRow).Methods("POST", "OPTIONS")
+	a.Router.HandleFunc("/waybill/{id:[0-9]+}", controller.DeleteWaybill).Methods("DELETE", "OPTIONS")
+	a.Router.HandleFunc("/waybillrows/{id:[0-9]+}", controller.DeleteWaybillRows).Methods("DELETE", "OPTIONS")
+	a.Router.HandleFunc("/waybill/{id:[0-9]+}", controller.ChangeStatusWaybill).Methods("PATCH", "OPTIONS")
+
+	a.Router.HandleFunc("/stock/{id:[0-9]+}", controller.GetStock).Methods("GET")
 }

@@ -17,6 +17,8 @@
                     <b-table-column field="brand" label="Производитель" v-slot="props">{{props.row.brand}}</b-table-column>
                     <b-table-column field="actions" label="Действия" v-slot="props">
                         <router-link :to="'/products/' + props.row.id" class="button is-info is-small">Просмотр</router-link>
+                        &nbsp;&nbsp;&nbsp;
+                        <b-button type="is-danger" @click="deleteRow(props.row.id)" size="is-small">Удалить</b-button>
                     </b-table-column>
             </b-table>
         </section>
@@ -29,7 +31,7 @@ import Axios from "axios";
 Axios.defaults.baseURL = 'http://localhost:8010';
 
 export default {
-    name: "Index",
+    name: "ProductIndex",
     computed: {},
     data: function() {
         return {
@@ -70,8 +72,9 @@ export default {
         doneEdit(obj) {
             obj.editing = false;
         },
-        pullRow(row) {
-            this.$emit("update-selected", row);
+        deleteRow: async function (id) {
+            await Axios.delete('/product/' + id);
+            this.loadAsyncData();
         }
     },
     mounted() {

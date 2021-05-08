@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS "receipt" (
   "id" bigserial PRIMARY KEY,
   "status" smallint NOT NULL DEFAULT 0,
-  "created_at" timestamptz NOT NULL DEFAULT (now())
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "updated_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE IF NOT EXISTS "receipt_table" (

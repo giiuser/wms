@@ -128,3 +128,21 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
+
+func SearchProduct(w http.ResponseWriter, r *http.Request) {
+	keys, ok := r.URL.Query()["query"]
+
+	if !ok || len(keys[0]) < 1 {
+		return
+	}
+
+	query := keys[0]
+
+	products, err := model.GetProductsByName(query)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, products)
+}

@@ -1,43 +1,10 @@
 <template>
     <div class="content">
-        <!-- <loading :active.sync="isLoading" :is-full-page="fullPage"></loading> -->
         <div class="card">
-            <!-- <div class="card-content">
-                <div class="content">
-                    <div class="content">
-                        <b-select placeholder="На какой склад" v-model="toStock">
-                            <option v-for="stock in stocks" :key="stock.id" :value="stock.id">{{ stock.name }}</option>
-                        </b-select>
-                    </div>
-                </div>
-                <div class="mb-1" v-if="isErr">
-                    <div class="control">
-                        <p class="has-text-danger">Вы не выбрали склад!</p>
-                    </div>
-                </div>
-            </div> -->
             <div class="card-content">
                 <div class="field has-addons mb-1">
                     <div class="control">
                         <input class="input" type="text" :ref="'barcode'" @input="setBarcode" placeholder="Сканируйте штрихкод"  v-model="barcode">
-                        <!-- <vue-simple-suggest
-                            ref="wmsSuggestComponent"
-                            v-model="searchString"
-                            value-attribute="key"
-                            :max-suggestions="0"
-                            placeholder="Начните вводить наименование или артикул"
-                            display-attribute="display"
-                            :list="suggestionList"
-                            :styles="{ defaultInput: {'input':true, 'is-medium':true} }"
-                            :prevent-submit="true"
-                            :debounce="200"
-                            @select="onSuggestSelect">
-                            <div slot="suggestion-item" slot-scope="{ suggestion }">
-                                <div>
-                                    <span>{{ suggestion.name }}</span>
-                                </div>
-                            </div>
-                        </vue-simple-suggest> -->
                     </div>
                 </div>
             </div>
@@ -56,9 +23,7 @@
                             <td>{{ item.name }}</td>
                             <td>
                                 <div class="quantity-toggle">
-                                    <!-- <button @click="decrement(key)">&mdash;</button> -->
-                                        <input type="text" :value="item.qty" readonly style="width:50px">
-                                    <!-- <button @click="increment(key)">&#xff0b;</button> -->
+                                    <input type="text" :value="item.qty" readonly style="width:50px">
                                 </div>
                             </td>
                             <td><font-awesome-icon @click="deleteRow(item.id, key)" class="has-text-danger" icon="trash" /></td>
@@ -73,7 +38,7 @@
                 <p>
                     <a class="button is-success is-rounded" @click="posting()">{{ this.status == 2 ? 'Распровести' : 'Провести' }}</a>
                     &nbsp;&nbsp;&nbsp;
-                    <a class="button is-primary is-rounded" @click="createAllocation()">Создать размещение</a>
+                    <a class="button is-primary is-rounded" v-if="this.status == 2" @click="createAllocation()">Создать размещение</a>
                 </p>
             </div>
         </div>
@@ -81,8 +46,6 @@
 </template>
 
 <script>
-    // import VueSimpleSuggest from 'vue-simple-suggest';
-    // import Loading from 'vue-loading-overlay';
     import Axios from 'axios';
 
     Axios.defaults.baseURL = 'http://localhost:8010';
@@ -173,8 +136,7 @@
             }
         },
         components: {
-            // VueSimpleSuggest,
-            // Loading
+
         }
     }
 </script>

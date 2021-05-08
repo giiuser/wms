@@ -1,10 +1,12 @@
 package model
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type Allocation struct {
-	ID           int             `json:"id"`
-	CreatedAt    time.Time       `json:"created_at"`
+	BaseModel
 	Status       int             `json:"status"`
 	DocumentId   int             `json:"document_id"`
 	DocumentType string          `json:"document_type"`
@@ -12,13 +14,14 @@ type Allocation struct {
 }
 
 type AllocationRow struct {
-	ID           int    `json:"id"`
-	Name         string `json:"name"`
-	Brand        string `json:"brand"`
-	AllocationId int    `json:"allocation_id"`
-	ProductId    int    `json:"product_id"`
-	Qty          int    `json:"qty"`
-	CellId       int    `json:"cell_id"`
+	ID           int            `json:"id"`
+	Name         string         `json:"name"`
+	Brand        string         `json:"brand"`
+	AllocationId int            `json:"allocation_id"`
+	ProductId    int            `json:"product_id"`
+	Qty          int            `json:"qty"`
+	CellId       int            `json:"cell_id"`
+	CellName     sql.NullString `json:"cell_name"`
 }
 
 func GetAllocation(id int) (Allocation, error) {
@@ -30,7 +33,7 @@ func GetAllocation(id int) (Allocation, error) {
 	}
 
 	rows, err := DB.Query(
-		"SELECT at.id, p.name, p.brand, at.allocation_id, at.product_id, at.qty, at.cell_id FROM allocation_table at JOIN product p ON p.id = at.product_id WHERE allocation_id=$1",
+		"SELECT at.id, p.name, p.brand, at.allocation_id, at.product_id, at.qty, at.cell_id, c.name FROM allocation_table at JOIN product p ON p.id = at.product_id LEFT JOIN cell c ON c.id = at.cell_id WHERE allocation_id=$1",
 		id)
 
 	if err != nil {
@@ -43,7 +46,7 @@ func GetAllocation(id int) (Allocation, error) {
 
 	for rows.Next() {
 		var ar AllocationRow
-		if err := rows.Scan(&ar.ID, &ar.Name, &ar.Brand, &ar.AllocationId, &ar.ProductId, &ar.Qty, &ar.CellId); err != nil {
+		if err := rows.Scan(&ar.ID, &ar.Name, &ar.Brand, &ar.AllocationId, &ar.ProductId, &ar.Qty, &ar.CellId, &ar.CellName); err != nil {
 			return a, err
 		}
 		products = append(products, ar)
@@ -55,7 +58,7 @@ func GetAllocation(id int) (Allocation, error) {
 
 func GetAllocations(start, count int) ([]Allocation, error) {
 	rows, err := DB.Query(
-		"SELECT id, status, created_at FROM allocation LIMIT $1 OFFSET $2",
+		"SELECT id, status, document_id, document_type, created_at, updated_at FROM allocation LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -68,7 +71,7 @@ func GetAllocations(start, count int) ([]Allocation, error) {
 
 	for rows.Next() {
 		var a Allocation
-		if err := rows.Scan(&a.ID, &a.Status, &a.CreatedAt); err != nil {
+		if err := rows.Scan(&a.ID, &a.Status, &a.DocumentId, &a.DocumentType, &a.CreatedAt, &a.UpdatedAt); err != nil {
 			return nil, err
 		}
 		allocations = append(allocations, a)
@@ -78,8 +81,8 @@ func GetAllocations(start, count int) ([]Allocation, error) {
 }
 
 func UpdateAllocation(id int, documentId int, documentType string) error {
-	_, err := DB.Exec("UPDATE allocation SET document_id=$1, document_type=$2 WHERE id=$3",
-		documentId, documentType, id)
+	_, err := DB.Exec("UPDATE allocation SET document_id=$1, document_type=$2, updated_at=$3 WHERE id=$4",
+		documentId, documentType, time.Now(), id)
 
 	return err
 }
@@ -108,8 +111,8 @@ func CreateAllocationRow(waybillId int, productId int, qty int, cellId int) (All
 	var ar AllocationRow
 
 	err := DB.QueryRow(
-		"INSERT INTO allocation_table(allocation_id, product_id, qty, cell_id) VALUES($1, $2, $3, $4) RETURNING allocation_id, product_id, qty, cell_id",
-		waybillId, productId, qty, cellId).Scan(&ar.AllocationId, &ar.ProductId, &ar.Qty, &ar.CellId)
+		"INSERT INTO allocation_table(allocation_id, product_id, qty, cell_id) VALUES($1, $2, $3, $4) RETURNING id, allocation_id, product_id, qty, cell_id",
+		waybillId, productId, qty, cellId).Scan(&ar.ID, &ar.AllocationId, &ar.ProductId, &ar.Qty, &ar.CellId)
 
 	if err != nil {
 		return ar, err
@@ -126,8 +129,8 @@ func UpdateAllocationRow(id int, cellId int) error {
 }
 
 func ChangeStatusAllocation(id int, status int) error {
-	_, err := DB.Exec("UPDATE allocation SET status=$1 WHERE id=$2",
-		status, id)
+	_, err := DB.Exec("UPDATE allocation SET status=$1, updated_at=$2 WHERE id=$3",
+		status, time.Now(), id)
 
 	if status == 2 {
 		MakeCellPosting(id, "allocation", true)

@@ -12,9 +12,17 @@
             <b-navbar-item href="/">
                 Домой
             </b-navbar-item>
-            <b-navbar-item href="/products">
-                Товары
-            </b-navbar-item>
+            <b-navbar-dropdown label="Склад">
+                <b-navbar-item href="/products">
+                    Товары
+                </b-navbar-item>
+                <b-navbar-item href="/cells">
+                    Полки
+                </b-navbar-item>
+                <b-navbar-item href="/stocks">
+                    Остатки
+                </b-navbar-item>
+            </b-navbar-dropdown>
             <b-navbar-dropdown label="Документы">
                 <b-navbar-item href="/receipts">
                     Оприходования
@@ -32,16 +40,7 @@
         </template>
 
         <template #end>
-            <b-navbar-item tag="div">
-                <div class="buttons">
-                    <a class="button is-primary">
-                        <strong>Sign up</strong>
-                    </a>
-                    <a class="button is-light">
-                        Log in
-                    </a>
-                </div>
-            </b-navbar-item>
+        
         </template>
     </b-navbar>
 </template>

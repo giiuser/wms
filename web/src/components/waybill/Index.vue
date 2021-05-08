@@ -2,7 +2,7 @@
     <div class="wares-table">
         <section>
             <b-field>
-                <b-button tag="router-link" to="/receipt/new" type="is-success">Создать новый</b-button>
+                <b-button tag="router-link" to="/waybill/new" type="is-success">Создать новый</b-button>
             </b-field>
             <b-table
                 :data="data"
@@ -19,6 +19,9 @@
                         <b-tag :type="props.row.status ? 'is-success' : 'is-warning'" v-if="props.row.status !== 3">{{props.row.status ? 'проведен' : 'не проведен'}}</b-tag>
                         <b-tag type="is-dark" v-else>в архиве</b-tag>
                     </b-table-column>
+                    <b-table-column field="status" label="Документ-основание" v-slot="props">
+                        {{ props.row.document_id + '/' + props.row.document_type }}
+                    </b-table-column>
                     <b-table-column field="actions" label="Действия" v-slot="props">
                         <div class="buttons">
                         <router-link :to="'/allocation/' + props.row.id" v-if="props.row.status !== 3" class="button is-info is-small">Редактирование</router-link>
@@ -32,13 +35,13 @@
 </template>
 
 <script>
-import moment from "moment";
 import Axios from "axios";
+import moment from 'moment';
 
 Axios.defaults.baseURL = 'http://localhost:8010';
 
 export default {
-    name: "ReceiptIndex",
+    name: "WaybillIndex",
     computed: {},
     data: function() {
         return {
@@ -54,7 +57,7 @@ export default {
         loadAsyncData() {
             this.loading = true;
 
-            Axios.get("/receipts")
+            Axios.get("/waybills")
                 .then(response => {
                     let currentTotal = response.data.length;
                     if (response.data.length / this.perPage > 1000) {
@@ -80,7 +83,7 @@ export default {
             obj.editing = false;
         },
         deleteRow: async function (id) {
-            await Axios.delete('/receipt/' + id);
+            await Axios.delete('/waybill/' + id);
             this.loadAsyncData();
         },
         formatDate: function(value) {
@@ -90,7 +93,7 @@ export default {
             }
         },
         setArchive: async function (id) {
-            await Axios.patch('/receipt/' + id,
+            await Axios.patch('/waybill/' + id,
                 {
                     status: 3
                 }

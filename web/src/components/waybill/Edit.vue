@@ -22,20 +22,12 @@
                         <th scope="col">Наименование</th>
                         <th scope="col">Производитель</th>
                         <th scope="col">Кол-во</th>
-                        <th scope="col">Стеллаж</th>
-                        <th scope="col">Удалить</th>
-                        </thead>
+                          </thead>
                         <tbody>
                         <tr v-for="(item, key) in rowData" :key="key">
                             <td>{{ item.name }}</td>
                             <td>{{ item.brand }}</td>
                             <td>{{ item.qty }}</td>
-                            <td>
-                                <div>
-                                    <input type="text" @input="setCell(item.id, $event.target.value)" :value="item.cell_name.String" style="width:50px" :disabled="status === 2">
-                                </div>
-                            </td>
-                            <td><font-awesome-icon v-if="status === 0" @click="deleteRow(item.id, key)" class="has-text-danger" icon="trash" /></td>
                         </tr>
                         </tbody>
                     </table>
@@ -58,19 +50,18 @@
     Axios.defaults.baseURL = 'http://localhost:8010';
 
     export default {
-        name: "AllocationEdit",
+        name: "WaybillEdit",
         async created() {
             console.log(this.$route.params.allocationId);
-            if (this.$route.params.allocationId !== 'new' && this.$route.params.allocationId !== undefined) {
+            if (this.$route.params.waybillId !== 'new' && this.$route.params.waybillId !== undefined) {
 
                 try {
-                    const response = await Axios.get('/allocation/' + this.$route.params.allocationId)
+                    const response = await Axios.get('/waybill/' + this.$route.params.waybillId)
 
                     if (response.status !== 200) {
-                        throw 'allocation not available';
+                        throw 'waybill not available';
                     }
 
-                    this.baseDocumentId = response.data.document_id;
                     this.status = response.data.status;
                     this.rowData = response.data.products;
                     this.documentId = response.data.id;
@@ -92,36 +83,36 @@
         }),
         computed: {
             baseDocumentId: {
-                get () { return this.$store.getters['allocation/documentReceiptId'] },
-                set (value) { this.$store.dispatch('allocation/setDocumentId', value) }
+                get () { return this.$store.getters['waybill/documentReceiptId'] },
+                set (value) { this.$store.dispatch('waybill/setDocumentId', value) }
             },
         },
         methods: {
             setBaseDocumentId: async function () {
                 if (this.baseDocumentId !== '') {
                     try {
-                        await Axios.delete('/allocationrows/' + this.documentId);
+                        await Axios.delete('/waybillrows/' + this.documentId);
                         this.rowData = [];
-                        const response = await Axios.get('/receipt/' + this.baseDocumentId);
-                        await Axios.put('/allocation/' + this.documentId, {
+                        const response = await Axios.get('/collect/' + this.baseDocumentId);
+                        await Axios.put('/waybill/' + this.documentId, {
                             document_id: Number(this.documentId),
-                            document_type: "receipt"
+                            document_type: "collect"
                         });
                         for (let key in response.data.products) {
                             let row = new Object();
+                            console.log(response.data.products[key]);
+                            row.id = response.data.products[key].id;
                             row.name = response.data.products[key].name;
                             row.brand = response.data.products[key].brand;
                             row.product_id = response.data.products[key].product_id;
                             row.qty = response.data.products[key].qty;
-                            row.cell_name = '';
-                            const responseRow = await Axios.post('/allocationrow', {
-                                allocation_id: this.documentId,
-                                product_id: row.product_id,
-                                qty: row.qty,
-                                cell_id: 0
-                            });
-                            row.id = responseRow.data.id;
+                            row.cell = '';
                             this.rowData.push(row);
+                            await Axios.post('/waybillrow', {
+                                waybill_id: this.documentId,
+                                product_id: row.product_id,
+                                qty: row.qty
+                            });
                         }
                     } catch (error) {
                         console.log(error);
@@ -131,7 +122,7 @@
                 }
             },
             deleteRow: async function (id, key) {
-                await Axios.delete('/receiptrow/' + id);
+                await Axios.delete('/waybillrow/' + id);
                 this.rowData.splice(key, 1);
             },
             increment (key) {
@@ -145,7 +136,7 @@
                 }
             },
             posting: async function () {
-                await Axios.patch('/allocation/' + this.$route.params.allocationId,
+                await Axios.patch('/waybill/' + this.$route.params.waybillId,
                     {
                         status: this.status == 2 ? 1 : 2
                     }
@@ -153,12 +144,12 @@
                 this.status = this.status == 2 ? 1 : 2
             },
             createAllocation() {
-                this.$store.dispatch('allocation/setDocumentId', this.documentId);
-                this.$router.push('/allocation/new');
+                this.$store.dispatch('waybill/setDocumentId', this.documentId);
+                this.$router.push('/waybill/new');
             },
             setCell: async function (id, key) {
                 console.log(id,key);
-                await Axios.put('/allocationrow/' + id,
+                await Axios.put('/waybillrow/' + id,
                     {
                         cell_id: Number(key)
                     }

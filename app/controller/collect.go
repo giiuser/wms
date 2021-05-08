@@ -94,29 +94,30 @@ func CreateCollectRow(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusCreated, p)
 }
 
-func ChangeStatusCollect(w http.ResponseWriter, r *http.Request) {
+func UpdateCollectRow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid product ID")
+		respondWithError(w, http.StatusBadRequest, "Invalid collect ID")
 		return
-
-		var c model.Collect
-		decoder := json.NewDecoder(r.Body)
-		if err := decoder.Decode(&c); err != nil {
-			respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-			return
-		}
-		defer r.Body.Close()
-		c.ID = id
-
-		if err := model.ChangeStatusWaybill(c.ID, c.Status); err != nil {
-			respondWithError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		respondWithJSON(w, http.StatusOK, c)
 	}
+
+	var cr model.CollectRow
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&cr); err != nil {
+		fmt.Println(err)
+		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
+		return
+	}
+	defer r.Body.Close()
+	cr.ID = id
+
+	if err := model.UpdateCollectRow(cr.ID, cr.CellId); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, cr)
 }
 
 func DeleteCollectRow(w http.ResponseWriter, r *http.Request) {
@@ -133,4 +134,29 @@ func DeleteCollectRow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+func ChangeStatusCollect(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid product ID")
+		return
+	}
+
+	var c model.Collect
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&c); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	defer r.Body.Close()
+	c.ID = id
+
+	if err := model.ChangeStatusCollect(c.ID, c.Status); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, c)
 }

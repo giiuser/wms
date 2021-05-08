@@ -11,6 +11,11 @@ import AllocationIndex from './components/allocation/Index';
 import AllocationEdit from './components/allocation/Edit';
 import CollectIndex from './components/collect/Index';
 import CollectEdit from './components/collect/Edit';
+import CellIndex from './components/cell/Index';
+import CellCreate from './components/cell/Create';
+import WaybillIndex from './components/waybill/Index';
+import WaybillEdit from './components/waybill/Edit';
+import StockIndex from './components/stock/Index';
 
 import Axios from "axios";
 
@@ -44,6 +49,12 @@ export default new VueRouter({
         //         alert(error);
         //     }
         // }
+    },
+    { path: '/cells', component: CellIndex },
+    {
+         path: "/cells/new",
+         name: "createcell",
+         component: CellCreate,
     },
     {
         path: "/products/:productId",
@@ -136,5 +147,30 @@ export default new VueRouter({
         name: "editcollect",
         component: CollectEdit
     },
+    { path: '/waybills', component: WaybillIndex },
+    {
+        path: "/waybill/new",
+        name: "createwaybill",
+        component: WaybillEdit,
+        async beforeEnter(routeTo, routeFrom, next) {
+            try {
+                const response = await Axios.post("/waybill", {});
+
+                if (response.status !== 201) {
+                    throw "posting error";
+                }
+
+                next("/waybill/" + response.data.id);
+            } catch (error) {
+                alert(error);
+            }
+        }
+    },
+    {
+        path: "/waybill/:waybillId",
+        name: "editwaybill",
+        component: WaybillEdit
+    },
+    { path: '/stocks', component: StockIndex },
  ]
 });
