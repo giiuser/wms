@@ -9,9 +9,6 @@ import (
 	"os"
 	"wms/app"
 	"wms/app/model"
-
-	_ "github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/cmd/migrate"
 )
 
 func main() {
