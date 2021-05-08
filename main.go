@@ -17,7 +17,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	model.DB, err = sql.Open("postgres", "postgres://postgres:1234@localhost:5432/wms?sslmode=disable")
+	dbURL := os.Getenv("DATABASE_URL")
+	// model.DB, err = sql.Open("postgres", "postgres://postgres:1234@localhost:5432/wms?sslmode=disable")
+	model.DB, err = sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatal(err)
 	}
