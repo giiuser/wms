@@ -24,6 +24,8 @@ cloud.google.com/go/storage
 github.com/Azure/azure-pipeline-go/pipeline
 # github.com/Azure/azure-storage-blob-go v0.13.0
 github.com/Azure/azure-storage-blob-go/azblob
+# github.com/Bowery/prompt v0.0.0-20190916142128-fa8279994f75
+## explicit
 # github.com/ClickHouse/clickhouse-go v1.4.5
 ## explicit
 github.com/ClickHouse/clickhouse-go
@@ -160,6 +162,8 @@ github.com/cloudflare/golz4
 # github.com/cockroachdb/cockroach-go v2.0.1+incompatible
 ## explicit
 github.com/cockroachdb/cockroach-go/crdb
+# github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
+## explicit
 # github.com/denisenkom/go-mssqldb v0.10.0
 ## explicit
 github.com/denisenkom/go-mssqldb
@@ -246,6 +250,8 @@ github.com/google/go-github/github
 # github.com/google/go-querystring v1.1.0
 ## explicit
 github.com/google/go-querystring/query
+# github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
+## explicit
 # github.com/google/uuid v1.2.0
 ## explicit
 github.com/google/uuid
@@ -277,6 +283,8 @@ github.com/jstemmer/go-junit-report/parser
 # github.com/k0kubun/pp v3.0.1+incompatible
 ## explicit
 github.com/k0kubun/pp
+# github.com/kardianos/govendor v1.0.9
+## explicit
 # github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 github.com/kardianos/osext
 # github.com/klauspost/compress v1.12.2
@@ -635,6 +643,8 @@ google.golang.org/protobuf/types/known/timestamppb
 google.golang.org/protobuf/types/pluginpb
 # gopkg.in/inf.v0 v0.9.1
 gopkg.in/inf.v0
+# gopkg.in/yaml.v2 v2.4.0
+## explicit
 # modernc.org/b v1.0.1
 ## explicit
 modernc.org/b
