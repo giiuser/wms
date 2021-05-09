@@ -13,13 +13,14 @@ import (
 
 func main() {
 	var err error
-	port, err := getPort()
+	// port, err := getPort()
+	port := ":8010"
 	if err != nil {
 		log.Fatal(err)
 	}
-	dbURL := os.Getenv("DATABASE_URL")
-	// model.DB, err = sql.Open("postgres", "postgres://postgres:1234@localhost:5432/wms?sslmode=disable")
-	model.DB, err = sql.Open("postgres", dbURL)
+	// dbURL := os.Getenv("DATABASE_URL")
+	model.DB, err = sql.Open("postgres", "postgres://postgres:1234@localhost:5432/wms?sslmode=disable")
+	// model.DB, err = sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,7 +31,6 @@ func main() {
 }
 
 func getPort() (string, error) {
-	// the PORT is supplied by Heroku
 	port := os.Getenv("PORT")
 	if port == "" {
 		return "", fmt.Errorf("$PORT not set")

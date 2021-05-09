@@ -12,15 +12,6 @@ type Waybill struct {
 	Products     []WaybillRow `json:"products"`
 }
 
-type WaybillRow struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name"`
-	Brand     string `json:"brand"`
-	WaybillId int    `json:"waybill_id"`
-	ProductId int    `json:"product_id"`
-	Qty       int    `json:"qty"`
-}
-
 func GetWaybill(id int) (Waybill, error) {
 	var wb Waybill
 	row := DB.QueryRow("SELECT id, status, document_id, document_type FROM waybill WHERE id=$1", id)
@@ -80,20 +71,6 @@ func CreateWaybill(documentId int, documentType string) (Waybill, error) {
 	return w, nil
 }
 
-func CreateWaybillRow(waybillId int, productId int, qty int) (WaybillRow, error) {
-	var wbr WaybillRow
-
-	err := DB.QueryRow(
-		"INSERT INTO waybill_table(waybill_id, product_id, qty) VALUES($1, $2, $3) RETURNING waybill_id, product_id, qty",
-		waybillId, productId, qty).Scan(&wbr.WaybillId, &wbr.ProductId, &wbr.Qty)
-
-	if err != nil {
-		return wbr, err
-	}
-
-	return wbr, nil
-}
-
 func GetWaybills(start, count int) ([]Waybill, error) {
 	rows, err := DB.Query(
 		"SELECT id, status, document_id, document_type, created_at, updated_at FROM waybill LIMIT $1 OFFSET $2",
@@ -127,12 +104,6 @@ func ChangeStatusWaybill(id int, status int) error {
 	} else if status == 1 {
 		MakePosting(id, "waybill", true)
 	}
-
-	return err
-}
-
-func DeleteWaybillRows(id int) error {
-	_, err := DB.Exec("DELETE FROM waybill_table WHERE waybill_id=$1", id)
 
 	return err
 }
