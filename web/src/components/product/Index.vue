@@ -28,7 +28,7 @@
 <script>
 import Axios from "axios";
 
-Axios.defaults.baseURL = 'http://localhost:8010';
+// Axios.defaults.baseURL = 'http://localhost:8010';
 
 export default {
     name: "ProductIndex",
@@ -47,7 +47,7 @@ export default {
         loadAsyncData() {
             this.loading = true;
 
-            Axios.get("/products")
+            Axios.get("/api/products")
                 .then(response => {
                     let currentTotal = response.data.length;
                     if (response.data.length / this.perPage > 1000) {
@@ -73,7 +73,7 @@ export default {
             obj.editing = false;
         },
         deleteRow: async function (id) {
-            await Axios.delete('/product/' + id);
+            await Axios.delete('/api/product/' + id);
             this.loadAsyncData();
         }
     },
