@@ -28,7 +28,7 @@
 <script>
 import Axios from "axios";
 
-Axios.defaults.baseURL = 'http://kvm2.j3979357.pkvkn.vps.myjino.ru';
+// Axios.defaults.baseURL = 'http://kvm2.j3979357.pkvkn.vps.myjino.ru';
 
 export default {
     name: "ProductIndex",

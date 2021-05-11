@@ -19,7 +19,7 @@ import StockIndex from './components/stock/Index';
 
 import Axios from "axios";
 
-// Axios.defaults.baseURL = 'http://localhost:8010';
+Axios.defaults.baseURL = 'http://kvm2.j3979357.pkvkn.vps.myjino.ru';
 
 Vue.use(VueRouter);
 
