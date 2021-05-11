@@ -47,7 +47,7 @@ export default {
         loadAsyncData() {
             this.loading = true;
 
-            Axios.get("/api/products")
+            Axios.get("/products")
                 .then(response => {
                     let currentTotal = response.data.length;
                     if (response.data.length / this.perPage > 1000) {
@@ -73,7 +73,7 @@ export default {
             obj.editing = false;
         },
         deleteRow: async function (id) {
-            await Axios.delete('/api/product/' + id);
+            await Axios.delete('/product/' + id);
             this.loadAsyncData();
         }
     },
