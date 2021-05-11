@@ -35,7 +35,7 @@
 import Axios from "axios";
 import moment from 'moment';
 
-Axios.defaults.baseURL = 'http://localhost:8010';
+// Axios.defaults.baseURL = 'http://localhost:8010';
 
 export default {
     name: "CollectIndex",

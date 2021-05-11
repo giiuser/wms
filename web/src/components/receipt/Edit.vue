@@ -48,7 +48,7 @@
 <script>
     import Axios from 'axios';
 
-    Axios.defaults.baseURL = 'http://localhost:8010';
+    // Axios.defaults.baseURL = 'http://localhost:8010';
 
     export default {
         name: "ReceiptEdit",

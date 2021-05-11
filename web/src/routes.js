@@ -19,7 +19,7 @@ import StockIndex from './components/stock/Index';
 
 import Axios from "axios";
 
-Axios.defaults.baseURL = 'http://localhost:8010';
+// Axios.defaults.baseURL = 'http://localhost:8010';
 
 Vue.use(VueRouter);
 

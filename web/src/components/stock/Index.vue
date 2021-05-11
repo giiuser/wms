@@ -44,7 +44,7 @@
 import Axios from "axios";
 import * as debounce from 'lodash/debounce'
 
-Axios.defaults.baseURL = 'http://localhost:8010';
+// Axios.defaults.baseURL = 'http://localhost:8010';
 
 export default {
     name: "StockIndex",
